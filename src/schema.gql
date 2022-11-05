@@ -22,7 +22,7 @@ enum ValidRoles {
 type Item {
   id: ID!
   name: String!
-  quantityUnit: String
+  quantityUnits: String
   user: User!
 }
 
@@ -47,6 +47,9 @@ type Mutation {
   createItem(createItemInput: CreateItemInput!): Item!
   updateItem(updateItemInput: UpdateItemInput!): Item!
   removeItem(id: ID!): Item!
+
+  """Execute seed database"""
+  executeSeed: Boolean!
 }
 
 input SignUpInput {
@@ -71,11 +74,11 @@ input UpdateUserInput {
 
 input CreateItemInput {
   name: String!
-  quantityUnit: String!
+  quantityUnits: String!
 }
 
 input UpdateItemInput {
   name: String
-  quantityUnit: String
+  quantityUnits: String
   id: ID!
 }

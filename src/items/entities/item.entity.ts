@@ -25,7 +25,7 @@ export class Item {
 
   @Column({ nullable: true })
   @Field(() => String, { nullable: true })
-  quantityUnit?: string; // g, ml, kg, tsp
+  quantityUnits?: string; // g, ml, kg, tsp
 
   //user
   @ManyToOne(() => User, (user) => user.items, { nullable: false, lazy: true })
