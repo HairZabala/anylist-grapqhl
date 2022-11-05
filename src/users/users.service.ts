@@ -10,6 +10,8 @@ import { Repository } from 'typeorm';
 import { SignUpInput } from './../auth/dto/inputs/signup.input';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
+import { ValidRoles } from 'src/auth/enums/valid-roles';
+import { UpdateUserInput } from './dto/update-user.input';
 
 @Injectable()
 export class UsersService {
@@ -32,16 +34,23 @@ export class UsersService {
     }
   }
 
-  async findAll(): Promise<User[]> {
-    return [];
+  async findAll(roles: ValidRoles[]): Promise<User[]> {
+    if (roles.length === 0) return this.usersRepository.find();
+    return this.usersRepository
+      .createQueryBuilder()
+      .andWhere('ARRAY[roles] && ARRAY[:...roles]', { roles })
+      .getMany();
   }
 
   async findOneByEmail(email: string): Promise<User> {
-    try {
-      return await this.usersRepository.findOneByOrFail({ email });
-    } catch (error) {
-      throw new NotFoundException(`${email} not found.`);
-    }
+    const user = await this.usersRepository.findOne({
+      where: { email },
+      select: ['email', 'password', 'id'],
+    });
+
+    if (!user) throw new NotFoundException(`${email} not found.`);
+
+    return user;
   }
 
   async findOneById(id: string): Promise<User> {
@@ -52,8 +61,35 @@ export class UsersService {
     }
   }
 
-  async block(id: string): Promise<User> {
-    throw new Error('block method not implemented.');
+  async update(
+    id: string,
+    updateUserInput: UpdateUserInput,
+    adminUser: User,
+  ): Promise<User> {
+    try {
+      if (updateUserInput.password) {
+        updateUserInput.password = bcrypt.hashSync(
+          updateUserInput.password,
+          10,
+        );
+      }
+
+      const user = await this.usersRepository.preload({
+        ...updateUserInput,
+        id,
+      });
+      user.lastUpdateBy = adminUser;
+      return await this.usersRepository.save(user);
+    } catch (error) {
+      this.handleDBExceptions(error);
+    }
+  }
+
+  async block(id: string, adminUser: User): Promise<User> {
+    const userToBlock = await this.findOneById(id);
+    userToBlock.isActive = false;
+    userToBlock.lastUpdateBy = adminUser;
+    return await this.usersRepository.save(userToBlock);
   }
 
   private handleDBExceptions(error: any): never {

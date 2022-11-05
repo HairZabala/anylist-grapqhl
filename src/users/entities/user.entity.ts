@@ -1,5 +1,12 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { ValidRoles } from 'src/auth/enums/valid-roles';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @ObjectType()
 @Entity({ name: 'users' })
@@ -21,13 +28,20 @@ export class User {
   })
   password: string;
 
-  @Field(() => [String])
+  @Field(() => [ValidRoles])
   @Column({ array: true, default: ['user'], type: 'text' })
-  roles: string[];
+  roles: ValidRoles[];
 
   @Field(() => Boolean)
   @Column({ default: true, type: 'boolean' })
   isActive = true;
 
-  // Relaciones y otras cosas
+  // Relaciones
+  @ManyToOne(() => User, (user) => user.lastUpdateBy, {
+    nullable: true,
+    lazy: true,
+  })
+  @JoinColumn({ name: 'lastUpdateBy' })
+  @Field(() => User, { nullable: true })
+  lastUpdateBy?: User;
 }
