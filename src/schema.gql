@@ -2,13 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Item {
-  id: ID!
-  name: String!
-  quantity: Float!
-  quantityUnit: String
-}
-
 type User {
   id: ID!
   fullName: String!
@@ -16,12 +9,21 @@ type User {
   roles: [ValidRoles!]!
   isActive: Boolean!
   lastUpdateBy: User
+  items: [Item!]!
+  itemCount: Int!
 }
 
 enum ValidRoles {
   admin
   superUser
   user
+}
+
+type Item {
+  id: ID!
+  name: String!
+  quantityUnit: String
+  user: User!
 }
 
 type AuthResponse {
@@ -69,13 +71,11 @@ input UpdateUserInput {
 
 input CreateItemInput {
   name: String!
-  quantity: Float!
   quantityUnit: String!
 }
 
 input UpdateItemInput {
   name: String
-  quantity: Float
   quantityUnit: String
   id: ID!
 }

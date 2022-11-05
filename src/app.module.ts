@@ -32,11 +32,10 @@ import { JwtService } from '@nestjs/jwt';
         autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
         plugins: [ApolloServerPluginLandingPageLocalDefault],
         context: ({ req }) => {
-          const token = req.headers.authorization.replace('Bearer ', '');
-          if (!token) throw Error('token needed');
-
-          const payload = JwtService.decode(token);
-          if (!payload) throw Error('token no valid');
+          // const token = req.headers.authorization.replace('Bearer ', '');
+          // if (!token) throw Error('token needed');
+          // const payload = JwtService.decode(token);
+          // if (!payload) throw Error('token no valid');
         },
       }),
     }),

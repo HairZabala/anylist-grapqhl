@@ -1,10 +1,12 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { ValidRoles } from 'src/auth/enums/valid-roles';
+import { Item } from 'src/items/entities/item.entity';
 import {
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -36,7 +38,7 @@ export class User {
   @Column({ default: true, type: 'boolean' })
   isActive = true;
 
-  // Relaciones
+  // Relations
   @ManyToOne(() => User, (user) => user.lastUpdateBy, {
     nullable: true,
     lazy: true,
@@ -44,4 +46,8 @@ export class User {
   @JoinColumn({ name: 'lastUpdateBy' })
   @Field(() => User, { nullable: true })
   lastUpdateBy?: User;
+
+  @OneToMany(() => Item, (item) => item.user, { lazy: true })
+  @Field(() => [Item])
+  items: Item[];
 }

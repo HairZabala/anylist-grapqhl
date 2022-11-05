@@ -5,6 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateItemInput, UpdateItemInput } from './dto/';
 import { Item } from './entities/item.entity';
@@ -18,34 +19,42 @@ export class ItemsService {
     private readonly itemsRepository: Repository<Item>,
   ) {}
 
-  async create(createItemInput: CreateItemInput): Promise<Item> {
-    const item = this.itemsRepository.create(createItemInput);
+  async create(createItemInput: CreateItemInput, user: User): Promise<Item> {
+    const item = this.itemsRepository.create({ ...createItemInput, user });
     return await this.itemsRepository.save(item);
   }
 
-  findAll(): Promise<Item[]> {
-    // TODO: filtrar, paginar, por usuario, etc
-    return this.itemsRepository.find();
+  async findAll(user: User): Promise<Item[]> {
+    const items = await this.itemsRepository.find({
+      where: { user: { id: user.id } },
+    });
+    return items;
   }
 
-  async findOne(id: string): Promise<Item> {
-    const item = await this.itemsRepository.findOneBy({ id });
+  async findOne(id: string, user: User): Promise<Item> {
+    const item = await this.itemsRepository.findOneBy({
+      id,
+      user: { id: user.id },
+    });
     if (!item) throw new BadRequestException(`Item with id ${id} not found`);
     return item;
   }
 
-  async update(id: string, updateItemInput: UpdateItemInput): Promise<Item> {
-    console.log(updateItemInput);
+  async update(
+    id: string,
+    updateItemInput: UpdateItemInput,
+    user: User,
+  ): Promise<Item> {
+    await this.findOne(id, user);
     const item = await this.itemsRepository.preload(updateItemInput);
-    console.log({ item });
     return this.itemsRepository.save(item);
   }
 
-  async remove(id: string): Promise<Item> {
+  async remove(id: string, user: User): Promise<Item> {
     // TODO: soft delete, integridad referencial, etc
-    const item = await this.findOne(id);
+    const item = await this.findOne(id, user);
     await this.itemsRepository.remove(item);
-    return { ...item, id };
+    return { ...item, user, id };
   }
 
   private handleDBExceptions(error: any) {
@@ -56,5 +65,11 @@ export class ItemsService {
     throw new InternalServerErrorException(
       'Unexpected error, check server logs',
     );
+  }
+
+  async itemCountByUser(user: User): Promise<number> {
+    return await this.itemsRepository.count({
+      where: { user: { id: user.id } },
+    });
   }
 }
