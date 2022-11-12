@@ -1,24 +1,18 @@
 import { InputType, Int, Field, ID } from '@nestjs/graphql';
-import {
-  IsBoolean,
-  IsNumber,
-  IsOptional,
-  IsPositive,
-  IsUUID,
-} from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsUUID, Min } from 'class-validator';
 
 @InputType()
 export class CreateListItemInput {
   @Field(() => Int, { nullable: true })
   @IsOptional()
-  @IsPositive()
   @IsNumber()
-  quantity = 0;
+  @Min(0)
+  quantity? = 0;
 
   @Field(() => Boolean, { nullable: true })
   @IsOptional()
   @IsBoolean()
-  completed = false;
+  completed? = false;
 
   @Field(() => ID)
   @IsUUID()
