@@ -14,7 +14,7 @@ import { Item } from './entities/item.entity';
 
 @Injectable()
 export class ItemsService {
-  private readonly logger = new Logger('ProductsService');
+  private readonly logger = new Logger('ItemsService');
 
   constructor(
     @InjectRepository(Item)

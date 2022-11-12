@@ -49,4 +49,7 @@ export class User {
 
   @OneToMany(() => Item, (item) => item.user, { lazy: true })
   items: Item[];
+
+  @OneToMany(() => Item, (item) => item.user)
+  lists: Item[];
 }

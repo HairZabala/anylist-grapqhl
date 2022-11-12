@@ -10,7 +10,9 @@ type User {
   isActive: Boolean!
   lastUpdateBy: User
   itemCount: Int!
+  listsCount: Int!
   items(limit: Int = 10, offset: Int = 0, search: String): [Item!]!
+  lists(limit: Int = 10, offset: Int = 0, search: String): [List!]!
 }
 
 enum ValidRoles {
@@ -26,6 +28,12 @@ type Item {
   user: User!
 }
 
+type List {
+  id: ID!
+  name: String!
+  user: User!
+}
+
 type AuthResponse {
   token: String!
   user: User!
@@ -37,6 +45,8 @@ type Query {
   user(id: ID!): User!
   items(limit: Int = 10, offset: Int = 0, search: String): [Item!]!
   item(id: ID!): Item!
+  lists(limit: Int = 10, offset: Int = 0, search: String): [List!]!
+  list(id: ID!): List!
 }
 
 type Mutation {
@@ -47,6 +57,9 @@ type Mutation {
   createItem(createItemInput: CreateItemInput!): Item!
   updateItem(updateItemInput: UpdateItemInput!): Item!
   removeItem(id: ID!): Item!
+  createList(createListInput: CreateListInput!): List!
+  updateList(updateListInput: UpdateListInput!): List!
+  removeList(id: ID!): List!
 
   """Execute seed database"""
   executeSeed: Boolean!
@@ -80,5 +93,14 @@ input CreateItemInput {
 input UpdateItemInput {
   name: String
   quantityUnits: String
+  id: ID!
+}
+
+input CreateListInput {
+  name: String!
+}
+
+input UpdateListInput {
+  name: String
   id: ID!
 }
