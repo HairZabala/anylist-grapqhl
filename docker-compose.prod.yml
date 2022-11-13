@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  # db:
+  #   image: mdillon/postgis:9.5-alpine
+  #   restart: always
+  #   ports:
+  #     - '${DB_PORT}:${DB_PORT}'
+  #   environment:
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
+  #     POSTGRES_DB: ${DB_NAME}
+  #   container_name: anylistDB
+  #   volumes:
+  #     - ./postgres:/var/lib/postgresql/data
+
+  # anylistapp:
+  #   # depends_on:
+  #   #   - db
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   image: hairzabala/anylist-graphql-prod
+  #   container_name: AnylistApp
+  #   restart: always # reiniciar el contenedor si se detiene
+  #   ports:
+  #     - '${PORT}:${PORT}'
+  #   env_file:
+  #     - .env.prod
+  #   environment:
+  #     PORT: ${PORT}
+
+  anylistapp:
+    image: hairzabala/anylist-graphql-prod:1.0.0
+    container_name: AnylistApp
+    restart: always # reiniciar el contenedor si se detiene
+    ports:
+      - '${PORT}:${PORT}'
+    env_file:
+      - .env.prod
+    environment:
+      PORT: ${PORT}
